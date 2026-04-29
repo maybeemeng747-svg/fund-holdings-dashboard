@@ -1,0 +1,33 @@
+{
+  "schema_version": "v1",
+  "generated_at": "2026-04-20T18:56:00+08:00",
+  "source": "repo_example",
+  "holdings": [
+    {
+      "fund_code": "000001",
+      "fund_name": "示例偏股混合基金C",
+      "shares": 5000,
+      "cost_nav": 1.62,
+      "confirmed_nav": 1.80,
+      "confirmed_nav_date": "2026-04-20",
+      "confirmed_market_value": 9000,
+      "confirmed_holding_profit": 900,
+      "confirmed_holding_profit_rate": 11.11,
+      "baseline_source": "repo_example",
+      "last_synced_at": "2026-04-20T18:56:00+08:00"
+    },
+    {
+      "fund_code": "000002",
+      "fund_name": "示例行业指数基金C",
+      "shares": 8000,
+      "cost_nav": 0.64,
+      "confirmed_nav": 0.75,
+      "confirmed_nav_date": "2026-04-20",
+      "confirmed_market_value": 6000,
+      "confirmed_holding_profit": 80,
+      "confirmed_holding_profit_rate": 1.35,
+      "baseline_source": "repo_example",
+      "last_synced_at": "2026-04-20T18:56:00+08:00"
+    }
+  ]
+}

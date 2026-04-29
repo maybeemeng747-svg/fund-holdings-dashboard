@@ -1,0 +1,21 @@
+{
+  "schema_version": "v1",
+  "generated_at": "2026-04-20T19:00:00+08:00",
+  "source": "repo_example",
+  "summary": {
+    "total_market_value": 15120,
+    "today_profit": 120,
+    "portfolio_daily_change_pct": 0.8,
+    "holding_profit": 1100,
+    "holding_profit_rate": 7.84,
+    "realtime_coverage": {
+      "estimated_count": 2,
+      "fallback_count": 0,
+      "total_count": 2,
+      "status": "full",
+      "latest_confirmed_nav_date": "2026-04-20",
+      "oldest_confirmed_nav_date": "2026-04-20"
+    }
+  },
+  "holdings": []
+}

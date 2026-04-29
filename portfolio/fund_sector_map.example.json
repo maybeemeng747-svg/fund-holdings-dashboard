@@ -1,0 +1,17 @@
+{
+  "updated_at": "2026-04-20T18:56:00+08:00",
+  "mappings": {
+    "000001": {
+      "position_role": "核心",
+      "style_tags": ["均衡成长", "主动混合"],
+      "sector_tags": ["A股", "主动权益"],
+      "holding_intent": "中期持有"
+    },
+    "000002": {
+      "position_role": "辅助",
+      "style_tags": ["行业指数", "高波动"],
+      "sector_tags": ["新能源", "光伏"],
+      "holding_intent": "观察轮动"
+    }
+  }
+}

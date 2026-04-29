@@ -1,0 +1,11 @@
+{
+  "name": "fund-holdings-dashboard-v1",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "bootstrap-data": "node scripts/bootstrap-portfolio.js",
+    "test": "node --test"
+  }
+}

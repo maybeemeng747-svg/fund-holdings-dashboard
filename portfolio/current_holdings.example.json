@@ -1,0 +1,55 @@
+{
+  "schema_version": "v1",
+  "portfolio_name": "示例基金组合",
+  "base_currency": "CNY",
+  "updated_at": "2026-04-20T18:56:00+08:00",
+  "source": {
+    "type": "manual_template",
+    "is_screenshot_import": false,
+    "image_name": null,
+    "imported_via": "repo_example",
+    "confirmed_at": null,
+    "note": "公开仓库示例数据，请替换成你自己的真实持仓。"
+  },
+  "import_quality": {
+    "confidence_level": "normal",
+    "warnings": [],
+    "degraded_funds": [],
+    "message": "这是公开仓库示例数据。"
+  },
+  "summary": {
+    "total_market_value": 15000,
+    "today_profit": 120,
+    "portfolio_daily_change_pct": 0.8,
+    "holding_profit": 980,
+    "holding_profit_rate": 6.99
+  },
+  "holdings": [
+    {
+      "fund_name": "示例偏股混合基金C",
+      "fund_code": "000001",
+      "market_value": 9000,
+      "shares": 5000,
+      "cost_nav": 1.62,
+      "latest_nav": 1.80,
+      "daily_change_pct": 1.2,
+      "yesterday_profit": 108,
+      "holding_profit": 900,
+      "holding_profit_rate": 11.11,
+      "notes": "示例数据"
+    },
+    {
+      "fund_name": "示例行业指数基金C",
+      "fund_code": "000002",
+      "market_value": 6000,
+      "shares": 8000,
+      "cost_nav": 0.64,
+      "latest_nav": 0.75,
+      "daily_change_pct": 0.2,
+      "yesterday_profit": 12,
+      "holding_profit": 80,
+      "holding_profit_rate": 1.35,
+      "notes": "示例数据"
+    }
+  ]
+}

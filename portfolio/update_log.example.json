@@ -1,0 +1,17 @@
+{
+  "schema_version": "v1",
+  "last_updated_at": "2026-04-20T18:56:00+08:00",
+  "entries": [
+    {
+      "id": "seed-example-0001",
+      "timestamp": "2026-04-20T18:56:00+08:00",
+      "source_type": "manual_template",
+      "image_name": null,
+      "status": "seeded_template",
+      "snapshot_file": null,
+      "holdings_count": 2,
+      "warning_count": 0,
+      "warnings": []
+    }
+  ]
+}

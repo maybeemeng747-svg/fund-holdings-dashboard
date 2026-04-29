@@ -1,0 +1,15 @@
+.DS_Store
+node_modules/
+.run/
+
+# Real local portfolio data should stay private.
+portfolio/current_holdings.json
+portfolio/confirmed_nav_snapshot.json
+portfolio/realtime_snapshot.json
+portfolio/transactions.json
+portfolio/fund_sector_map.json
+portfolio/update_log.json
+portfolio/snapshots/*.json
+
+# Local launchd copy
+*.log
