@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>持仓截图导入</title>
+<link rel="stylesheet" href="import.css">
+</head>
+<body>
+  <header class="import-header">
+    <a class="back-link" href="/" aria-label="返回持仓看板">←</a>
+    <h1>持仓截图导入</h1>
+  </header>
+
+  <main>
+    <section class="import-band">
+      <label class="file-picker" for="screenshot-input">
+        <span>选择持仓截图</span>
+        <strong id="selected-file">尚未选择</strong>
+      </label>
+      <input id="screenshot-input" type="file" accept="image/png,image/jpeg">
+      <button id="extract-button" type="button" disabled>提取并预览</button>
+      <p id="import-status" class="status" role="status"></p>
+    </section>
+
+    <section id="preview-section" class="preview-band" hidden>
+      <div class="preview-heading">
+        <h2>写入预览</h2>
+        <span id="import-scope"></span>
+      </div>
+      <ul id="preview-warnings" class="warnings"></ul>
+      <p id="diff-summary" class="diff-summary"></p>
+
+      <label for="holdings-json">持仓 JSON</label>
+      <textarea id="holdings-json" rows="18" spellcheck="false"></textarea>
+
+      <details>
+        <summary>OCR 原始文本</summary>
+        <pre id="raw-lines"></pre>
+      </details>
+
+      <label class="confirm-row">
+        <input id="confirm-checkbox" type="checkbox">
+        <span>我已核对预览内容并确认写入</span>
+      </label>
+      <button id="confirm-button" type="button" disabled>确认写入持仓</button>
+    </section>
+  </main>
+
+  <script src="import.js"></script>
+</body>
+</html>

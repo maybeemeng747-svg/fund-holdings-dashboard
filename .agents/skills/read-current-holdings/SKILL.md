@@ -1,18 +1,23 @@
+---
+title: Read Current Holdings
+description: 读取当前持仓真源和板块映射
+---
+
 # Read Current Holdings
 
 适用场景：当 investment-controller 或其他分析型 agent 在本项目中需要理解“当前持仓”时。
 
 ## Read Order
 
-1. 先读取 `portfolio/current_holdings.json`
+1. 先读取 `HOLDINGS_FILE` 指向的文件；未设置时读取 `portfolio/current_holdings.json`
 2. 再读取 `portfolio/fund_sector_map.json`
 3. 如需辅助回顾交易，可读取 `portfolio/transactions.json`
 4. 如需确认最近一次更新来源与状态，可读取 `portfolio/update_log.json`
-5. 如存在外部读取入口，优先接受 `/api/holdings`，但底层仍应与同一份 `portfolio/current_holdings.json` 对齐
+5. 如存在外部读取入口，优先接受 `/api/holdings`，但底层仍应与同一份 `HOLDINGS_FILE` 真源对齐
 
 ## Source Of Truth Rule
 
-- `portfolio/current_holdings.json` 是唯一当前持仓真源
+- `HOLDINGS_FILE` 指向的 JSON 是唯一当前持仓真源；未设置时默认为 `portfolio/current_holdings.json`
 - 若与历史聊天、旧截图、旧笔记或记忆冲突，以 JSON 为准
 - 不允许用聊天记忆覆盖 JSON 当前状态
 

@@ -3,6 +3,7 @@ import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 import { paths } from "./config.js";
+import { estimateFundNav } from "./fund-estimate.js";
 
 const FUND_GZ_ENDPOINT = "https://fundgz.1234567.com.cn/js";
 const CACHE_TTL_MS = 45 * 1000;
@@ -40,6 +41,15 @@ function todayLocalDate() {
     month: "2-digit",
     day: "2-digit",
   }).format(new Date());
+}
+
+function timestampToCSTDate(ts) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Shanghai",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date(ts));
 }
 
 async function readJsonIfExists(filePath, fallback) {
@@ -92,13 +102,57 @@ async function fetchFundEstimate(fundCode) {
   }
 }
 
+async function fetchConfirmedNavFromPingzhong(fundCode) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 8000);
+
+  try {
+    const response = await fetch(`https://fund.eastmoney.com/pingzhongdata/${fundCode}.js`, {
+      headers: {
+        Accept: "text/javascript, application/javascript, */*;q=0.8",
+        Referer: "https://fund.eastmoney.com/",
+        "User-Agent": "Mozilla/5.0 FundDashboard/1.0",
+      },
+      signal: controller.signal,
+    });
+    const text = await response.text();
+    const match = text.match(/var\s+Data_netWorthTrend\s*=\s*(\[[\s\S]*?\])\s*;/);
+    if (!match) return null;
+    const trend = JSON.parse(match[1]);
+    if (!Array.isArray(trend) || trend.length === 0) return null;
+    const latest = trend[trend.length - 1];
+    const prev = trend.length > 1 ? trend[trend.length - 2] : null;
+    const latestNav = safeNumber(latest?.y);
+    const latestDate = timestampToCSTDate(latest?.x);
+    if (latestNav === null) return null;
+    return {
+      fundcode: fundCode,
+      dwjz: latestNav,
+      jzrq: latestDate,
+      gsz: null,
+      gszzl: null,
+      gztime: null,
+      _source: "pingzhongdata",
+      _confirmed_return: safeNumber(latest?.equityReturn),
+      _prev_nav: prev ? safeNumber(prev?.y) : null,
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 async function getCachedFundEstimate(fundCode) {
   const current = quoteCache.get(fundCode);
   if (current && Date.now() - current.fetchedAt < CACHE_TTL_MS) {
     return current.quote;
   }
 
-  const rawQuote = await fetchFundEstimate(fundCode);
+  let rawQuote = await fetchFundEstimate(fundCode);
+  if (isInvalidFundGzQuote(rawQuote)) {
+    rawQuote = await fetchConfirmedNavFromPingzhong(fundCode);
+  }
   const quote = isInvalidFundGzQuote(rawQuote) ? null : rawQuote;
   quoteCache.set(fundCode, { quote, fetchedAt: Date.now() });
   return quote;
@@ -267,11 +321,28 @@ function buildBaselineIndexes(snapshot) {
   return { byKey, byName };
 }
 
-async function persistRealtimeSnapshot(payload) {
+function isEstimateFresh(estimatedSummary) {
+  if (!estimatedSummary) return false;
+  const asOf = estimatedSummary.estimate_as_of;
+  if (!asOf) return false;
+  const age = Date.now() - new Date(asOf).getTime();
+  return age >= 0 && age <= 300000;
+}
+
+async function persistRealtimeSnapshot(payload, estimatedSummary = null) {
   const snapshot = {
     schema_version: "v1",
     generated_at: nowIso(),
     ...payload,
+    estimated_summary: estimatedSummary ? {
+      total_market_value: estimatedSummary.total_market_value,
+      today_profit: estimatedSummary.today_profit,
+      portfolio_daily_change_pct: estimatedSummary.portfolio_daily_change_pct,
+      holding_profit: estimatedSummary.holding_profit,
+      holding_profit_rate: estimatedSummary.holding_profit_rate,
+      estimate_as_of: estimatedSummary.estimate_as_of || null,
+    } : null,
+    estimate_fresh: isEstimateFresh(estimatedSummary),
   };
   await writeJson(paths.realtimeSnapshotFile, snapshot);
 }
@@ -354,8 +425,13 @@ function resolveRealtimeFundCode(holding, baseline) {
   return holding.fund_code || baseline?.fund_code || null;
 }
 
-function buildHoldingRealtime(holding, quote, baseline, options = {}) {
-  const { previousBaseline = null, confirmedUpdated = false } = options;
+export async function buildHoldingRealtime(holding, quote, baseline, options = {}) {
+  const {
+    previousBaseline = null,
+    confirmedUpdated = false,
+    fundCode = null,
+    estimateFundNavFn = estimateFundNav,
+  } = options;
   const shares = safeNumber(holding.shares);
   const costNav = safeNumber(holding.cost_nav);
   const fallbackHoldingCost = shares !== null && costNav !== null ? shares * costNav : null;
@@ -371,11 +447,13 @@ function buildHoldingRealtime(holding, quote, baseline, options = {}) {
     (baseline?.confirmed_nav_date || quote?.jzrq || null) === todayLocalDate();
 
   if (!quote || !quote.fundcode) {
+    const fallbackDate = baseline?.confirmed_nav_date || null;
+    const isToday = fallbackDate === todayLocalDate();
     return {
       ...holding,
       latest_nav: confirmedNav ?? holding.latest_nav,
-      display_daily_change_pct: safeNumber(holding.daily_change_pct),
-      display_daily_profit: safeNumber(holding.yesterday_profit),
+      display_daily_change_pct: isToday ? safeNumber(holding.daily_change_pct) : null,
+      display_daily_profit: isToday ? safeNumber(holding.yesterday_profit) : null,
       display_market_value: confirmedMarketValue,
       display_holding_profit: confirmedHoldingProfit,
       display_holding_profit_rate: confirmedHoldingProfitRate,
@@ -383,8 +461,8 @@ function buildHoldingRealtime(holding, quote, baseline, options = {}) {
       realtime: {
         status: "fallback_snapshot",
         source: "confirmed_nav_snapshot",
-        as_of: null,
-        coverage: "stale",
+        as_of: fallbackDate,
+        coverage: isToday ? "stale" : "confirmed_stale_no_estimate",
         estimated_nav: null,
         estimated_change_pct: null,
         estimated_market_value: null,
@@ -392,7 +470,107 @@ function buildHoldingRealtime(holding, quote, baseline, options = {}) {
         estimated_holding_profit: null,
         estimated_holding_profit_rate: null,
         confirmed_nav: confirmedNav,
-        confirmed_nav_date: baseline?.confirmed_nav_date || null,
+        confirmed_nav_date: fallbackDate,
+        pending_nav: !isToday,
+      },
+    };
+  }
+
+  // pingzhongdata fallback: confirmed NAV available, try self-built estimate
+  if (quote?._source === "pingzhongdata") {
+    const confirmedReturn = safeNumber(quote._confirmed_return);
+    const prevNav = safeNumber(quote._prev_nav);
+    const confirmedDate = baseline?.confirmed_nav_date || quote.jzrq || null;
+    const isToday = confirmedDate === todayLocalDate();
+    const displayDailyPct = isToday ? (confirmedReturn ?? null) : null;
+    const displayDailyProfit = isToday
+      ? (shares !== null && prevNav !== null && confirmedNav !== null
+          ? roundNumber(shares * (confirmedNav - prevNav), 2)
+          : safeNumber(holding.yesterday_profit))
+      : null;
+
+    // Self-built intraday estimate using holdings × real-time stock quotes
+    const estimateBaseline = isToday ? prevNav : confirmedNav;
+    let selfEstimate = null;
+    if (estimateBaseline && fundCode) {
+      selfEstimate = await estimateFundNavFn(fundCode, estimateBaseline);
+    }
+
+    if (selfEstimate && selfEstimate.holdings_used > 0) {
+      const estNav = selfEstimate.estimated_nav;
+      const estMv = shares !== null ? roundNumber(shares * estNav, 2) : confirmedMarketValue;
+      const dailyBaselineMarketValue = isToday && shares !== null && prevNav !== null
+        ? roundNumber(shares * prevNav, 2)
+        : confirmedMarketValue;
+      const estDailyProfit = estMv !== null && dailyBaselineMarketValue !== null
+        ? roundNumber(estMv - dailyBaselineMarketValue, 2)
+        : null;
+      const estHoldingProfit = estMv !== null && fallbackHoldingCost !== null
+        ? roundNumber(estMv - fallbackHoldingCost, 2)
+        : confirmedHoldingProfit;
+      const estHoldingRate = estHoldingProfit !== null && fallbackHoldingCost
+        ? roundNumber((estHoldingProfit / fallbackHoldingCost) * 100, 2)
+        : confirmedHoldingProfitRate;
+
+      return {
+        ...holding,
+        latest_nav: estNav,
+        display_daily_change_pct: selfEstimate.estimated_change_pct,
+        display_daily_profit: estDailyProfit,
+        display_market_value: estMv,
+        display_holding_profit: estHoldingProfit,
+        display_holding_profit_rate: estHoldingRate,
+        confirmed_baseline: baseline || null,
+        realtime: {
+          status: "estimated",
+          source: "holdings_weighted_estimate",
+          as_of: selfEstimate.as_of,
+          coverage: "live",
+          estimated_nav: estNav,
+          estimated_change_pct: selfEstimate.estimated_change_pct,
+          estimated_market_value: estMv,
+          estimated_daily_profit: estDailyProfit,
+          estimated_holding_profit: estHoldingProfit,
+          estimated_holding_profit_rate: estHoldingRate,
+          confirmed_nav: confirmedNav,
+          confirmed_nav_date: confirmedDate,
+          confirmed_market_value: confirmedMarketValue,
+          estimate_coverage_pct: selfEstimate.coverage_pct,
+          estimate_holdings_used: selfEstimate.holdings_used,
+          estimate_holdings_total: selfEstimate.holdings_total,
+          estimate_report_date: selfEstimate.report_date,
+          estimate_in_trading: selfEstimate.in_trading_hours,
+          estimate_details: selfEstimate.details,
+          pending_nav: !isToday,
+        },
+      };
+    }
+
+    // Estimate failed, fall back to confirmed-only display
+    return {
+      ...holding,
+      latest_nav: confirmedNav ?? holding.latest_nav,
+      display_daily_change_pct: displayDailyPct,
+      display_daily_profit: displayDailyProfit,
+      display_market_value: confirmedMarketValue,
+      display_holding_profit: confirmedHoldingProfit,
+      display_holding_profit_rate: confirmedHoldingProfitRate,
+      confirmed_baseline: baseline || null,
+      realtime: {
+        status: "confirmed_only",
+        source: "pingzhongdata_confirmed_nav",
+        as_of: confirmedDate,
+        coverage: isToday ? "confirmed_no_estimate" : "confirmed_stale_no_estimate",
+        estimated_nav: null,
+        estimated_change_pct: null,
+        estimated_market_value: null,
+        estimated_daily_profit: null,
+        estimated_holding_profit: null,
+        estimated_holding_profit_rate: null,
+        confirmed_nav: confirmedNav,
+        confirmed_nav_date: confirmedDate,
+        confirmed_market_value: confirmedMarketValue,
+        pending_nav: !isToday,
       },
     };
   }
@@ -528,6 +706,11 @@ function calculateRealtimeSummary(holdings) {
     .map((item) => item.confirmed_baseline?.confirmed_nav_date)
     .filter(Boolean)
     .sort();
+  const estimateTimestamps = holdings
+    .map((item) => item.realtime?.as_of)
+    .filter(Boolean)
+    .sort();
+  const latestEstimateAsOf = estimateTimestamps.at(-1) || null;
 
   return {
     total_market_value: roundNumber(totalMarketValue, 2),
@@ -535,6 +718,7 @@ function calculateRealtimeSummary(holdings) {
     portfolio_daily_change_pct: portfolioDailyChangePct,
     holding_profit: roundNumber(totalHoldingProfit, 2),
     holding_profit_rate: totalHoldingProfitRate,
+    estimate_as_of: latestEstimateAsOf,
     realtime_coverage: {
       estimated_count: estimatedCount,
       fallback_count: fallbackCount,
@@ -581,11 +765,11 @@ export async function buildRealtimeOverlay(holdings) {
         quote,
       );
       baselineChanged ||= changed;
-      return buildHoldingRealtime(
+      return await buildHoldingRealtime(
         effectiveFundCode && !holding.fund_code ? { ...holding, fund_code: effectiveFundCode } : holding,
         quote,
         baseline,
-        { previousBaseline, confirmedUpdated },
+        { previousBaseline, confirmedUpdated, fundCode: effectiveFundCode },
       );
     }),
   );
@@ -616,7 +800,7 @@ export async function buildRealtimeOverlay(holdings) {
       realtime: holding.realtime,
       confirmed_baseline: holding.confirmed_baseline,
     })),
-  });
+  }, summary);
 
   return {
     holdings: realtimeHoldings,

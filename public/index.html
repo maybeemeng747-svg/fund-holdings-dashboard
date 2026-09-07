@@ -1,129 +1,56 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>基金持仓真源看板</title>
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <main class="page-shell">
-      <section class="hero">
-        <div>
-          <p class="eyebrow">Portfolio JSON Source of Truth</p>
-          <h1>基金持仓看板</h1>
-          <p class="hero-copy">统一读取 <code>portfolio/current_holdings.json</code>，适合 5 英寸小屏常驻查看。</p>
-          <div id="truth-status-banner" class="truth-status-banner hidden"></div>
-        </div>
-        <div class="hero-actions">
-          <button id="fullscreen-button" class="ghost-button">全屏</button>
-          <button id="refresh-dashboard" class="ghost-button">手动刷新</button>
-          <span id="auto-refresh-status">自动刷新：30 秒</span>
-        </div>
-      </section>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>持仓云图</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <!-- 顶部悬浮信息条 -->
+  <div id="overlay-bar">
+    <span id="total-value" class="overlay-total summary-toggle" role="button" tabindex="0" aria-pressed="false" title="隐藏总仓位和总收益">--</span>
+    <span id="today-pnl" class="overlay-pnl summary-toggle" role="button" tabindex="0" aria-pressed="false" title="隐藏总仓位和总收益">--</span>
+    <span id="market-turnover" class="overlay-market">两市成交 --<span id="market-turnover-yoy" class="overlay-market-yoy"></span></span>
+    <span id="polysilicon-price" class="overlay-poly">--</span>
+    <span id="data-status" class="overlay-status"></span>
+    <span id="update-time" class="overlay-time"></span>
+  </div>
 
-      <section class="panel import-panel">
-        <details class="import-collapse">
-          <summary class="import-summary">
-            <span>
-              <span class="eyebrow">Import Flow</span>
-              <strong>截图导入与真源维护</strong>
-            </span>
-            <span class="muted">默认收起，减少常驻占用</span>
-          </summary>
-          <div class="import-content">
-            <div class="upload-grid">
-              <label class="upload-box">
-                <input id="screenshot-input" type="file" accept="image/png,image/jpeg" />
-                <span>上传支付宝 / 养基宝持仓截图</span>
-                <small>支持 PNG / JPG，本地 OCR 识别后进入预览，不会自动写入。</small>
-              </label>
-              <div class="preview-side">
-                <div id="selected-file" class="muted">尚未选择截图</div>
-                <button id="extract-button" class="primary-button" disabled>提取并生成预览</button>
-              </div>
-            </div>
-            <div id="import-status" class="status-box">等待上传截图。</div>
-            <div id="preview-section" class="preview-section hidden">
-              <div class="subsection">
-                <h3>更新预览</h3>
-                <p id="preview-meta" class="muted"></p>
-                <ul id="preview-warnings" class="plain-list"></ul>
-              </div>
-              <div class="subsection">
-                <h3>差异比对</h3>
-                <div id="diff-summary" class="diff-grid"></div>
-              </div>
-              <div class="subsection">
-                <div class="table-header">
-                  <h3>结构化结果（可在确认前直接修改）</h3>
-                  <button id="confirm-button" class="primary-button">确认写入 current_holdings.json</button>
-                </div>
-                <div class="table-wrap">
-                  <table id="editable-table">
-                    <thead>
-                      <tr>
-                        <th>基金名称</th>
-                        <th>代码</th>
-                        <th>市值</th>
-                        <th>份额</th>
-                        <th>成本价</th>
-                        <th>最新净值</th>
-                        <th>日涨幅</th>
-                        <th>昨日收益</th>
-                        <th>持有收益</th>
-                        <th>持有收益率</th>
-                        <th>缺失 / 可疑</th>
-                      </tr>
-                    </thead>
-                    <tbody></tbody>
-                  </table>
-                </div>
-              </div>
-              <details class="subsection">
-                <summary>查看 OCR 原始识别行</summary>
-                <pre id="raw-lines"></pre>
-              </details>
-            </div>
-          </div>
-        </details>
-      </section>
+  <!-- 全屏 Treemap -->
+  <main id="main">
+    <section id="stock-section" class="treemap-section">
+      <div class="section-label">
+        <span class="section-icon">🪙</span> 股票
+        <span id="stock-count" class="count-badge">0</span>
+        <a class="section-action" href="/import.html">导入</a>
+      </div>
+      <div id="stock-treemap" class="treemap-container stock-area"></div>
+    </section>
+    <section id="fund-section" class="treemap-section">
+      <div class="section-label">
+        <span class="section-icon">📈</span> 基金
+        <span id="fund-count" class="count-badge">0</span>
+      </div>
+      <div id="fund-treemap" class="treemap-container fund-area"></div>
+    </section>
+  </main>
 
-      <section class="panel summary-panel">
-        <div class="panel-header">
-          <div>
-            <p class="eyebrow">Dashboard</p>
-            <h2>当前持仓总览</h2>
-          </div>
-          <div id="source-badge" class="source-badge"></div>
-        </div>
-        <div id="summary-cards" class="summary-grid"></div>
-      </section>
-
-      <section class="panel holdings-panel">
-        <div class="panel-header">
-          <div>
-            <p class="eyebrow">Holdings</p>
-            <h2>基金明细</h2>
-          </div>
-          <div class="detail-actions">
-            <button id="toggle-columns-button" class="ghost-button hidden">字段设置</button>
-            <button id="detail-refresh-button" class="ghost-button">刷新</button>
-          </div>
-        </div>
-        <div id="column-toolbar" class="column-toolbar hidden">
-          <div id="column-toggles" class="column-toggle-list"></div>
-        </div>
-        <div id="holdings-cards" class="holdings-grid"></div>
-        <div class="holdings-list-panel">
-          <div class="panel-subheader">
-            <h3>持仓明细列表</h3>
-            <p class="muted">按当前真源与确认仓位基线展示每只基金的基础持仓信息。</p>
-          </div>
-          <div id="holdings-list" class="holdings-list"></div>
-        </div>
-      </section>
-    </main>
-    <script type="module" src="/app.js"></script>
-  </body>
+  <div id="tooltip" class="tooltip hidden">
+    <div class="tooltip-header">
+      <span class="tooltip-name"></span>
+      <span class="tooltip-code"></span>
+    </div>
+    <div class="tooltip-body">
+      <div class="tooltip-row"><span class="tooltip-label">市值</span><span class="tooltip-value tooltip-mv"></span></div>
+      <div class="tooltip-row"><span class="tooltip-label">日涨跌</span><span class="tooltip-value tooltip-dc"></span></div>
+      <div class="tooltip-row"><span class="tooltip-label">今日盈亏</span><span class="tooltip-value tooltip-tp"></span></div>
+      <div class="tooltip-row"><span class="tooltip-label">持仓盈亏</span><span class="tooltip-value tooltip-hp"></span></div>
+      <div class="tooltip-row"><span class="tooltip-label">收益率</span><span class="tooltip-value tooltip-hr"></span></div>
+    </div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
 </html>

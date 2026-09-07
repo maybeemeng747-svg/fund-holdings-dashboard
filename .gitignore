@@ -1,11 +1,16 @@
 .DS_Store
 node_modules/
+__pycache__/
+*.pyc
 .run/
 
 # Real local portfolio data should stay private.
 portfolio/current_holdings.json
+portfolio/current_holdings.json.bak.*
+portfolio/*.json.bak*
 portfolio/confirmed_nav_snapshot.json
 portfolio/realtime_snapshot.json
+portfolio/prev_turnover.json
 portfolio/transactions.json
 portfolio/fund_sector_map.json
 portfolio/update_log.json

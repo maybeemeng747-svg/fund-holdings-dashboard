@@ -1,36 +1,73 @@
-# Fund Holdings Dashboard
+# 持仓看板（Portfolio Dashboard）
 
-一个给基金投资者用的本地工具：
+> A local-first dashboard for fund investors: import holdings from screenshots, maintain a JSON source of truth, track confirmed NAV-based positions, and monitor intraday estimated profit in real time.
 
-- 用截图导入基金持仓
-- 用 JSON 作为持仓真源
+![License](https://img.shields.io/badge/license-MIT-0f7b6c)
+![Platform](https://img.shields.io/badge/platform-macOS-f3f0e5)
+![Runtime](https://img.shields.io/badge/runtime-Node.js-1f2a22)
+![Status](https://img.shields.io/badge/status-local--first-e98b92)
+
+一个面向基金投资者的本地工具：
+
+- 从支付宝 / 养基宝截图导入持仓
+- 用 JSON 维护持仓真源
 - 自动维护确认净值快照与盘中估算
 - 提供适合小屏常驻查看的网页看板
+- 让 Agent / 自动化系统和网页统一读取同一份持仓数据
 
-这个项目适合：
+## Why
 
-- 买基金但平台不再给实时收益的人
-- 想自己维护持仓真源的人
-- 想把持仓交给 Agent / 自动化系统分析的人
+很多基金平台逐步弱化了盘中收益展示、实时估算和自定义持仓监控能力。
+这个项目的目标不是替代券商或基金平台，而是给个人投资者一个：
 
-## 功能概览
+- 更可控的持仓真源
+- 更透明的数据口径
+- 更适合自己工作流的本地看板
 
-- `portfolio/current_holdings.json`：持仓基础真源
-- `portfolio/confirmed_nav_snapshot.json`：最新确认净值后的真实仓位基线
-- `portfolio/realtime_snapshot.json`：盘中实时估算快照
-- `portfolio/fund_sector_map.json`：风格 / 板块 / 仓位角色映射
-- 网页看板统一读取同一套数据源
-- 截图导入必须先预览，再人工确认写入
-- 写入后自动生成历史快照和更新日志
+## Preview
 
-## 项目结构
+### Dashboard
+
+![Dashboard Preview](./docs/images/dashboard-preview.svg)
+
+### Import Flow
+
+![Import Flow](./docs/images/import-flow.svg)
+
+## Core Features
+
+- Screenshot import with OCR preview and manual confirmation
+- `current_holdings.json` as the base source of truth
+- `confirmed_nav_snapshot.json` as the confirmed position baseline
+- `realtime_snapshot.json` as the intraday estimate layer
+- One dashboard + one agent read path
+- Local-first privacy model: real portfolio files stay on your machine
+
+## Data Model
+
+### 1. Base holdings truth
+
+- `portfolio/current_holdings.json`
+- Stores fund name, fund code, shares, cost, and imported base holding state
+
+### 2. Confirmed position baseline
+
+- `portfolio/confirmed_nav_snapshot.json`
+- Stores the latest confirmed NAV-based market value, holding profit, and holding profit rate
+
+### 3. Intraday estimate layer
+
+- `portfolio/realtime_snapshot.json`
+- Stores today's estimated change, estimated daily profit, and realtime overlay state
+
+## Repository Layout
 
 ```text
 .
 ├── AGENTS.md
 ├── README.md
+├── LICENSE
 ├── package.json
-├── server.js
 ├── public/
 ├── scripts/
 ├── src/
@@ -41,168 +78,163 @@
     └── snapshots/
 ```
 
-## 重要说明
+## Privacy Model
 
-公开仓库里默认只提交示例模板，不提交你的真实持仓。
+This public repository ships only with example templates.
 
-这些真实数据文件已经被 `.gitignore` 忽略：
+Your real local data files are ignored by Git:
 
 - `portfolio/current_holdings.json`
+- `portfolio/current_holdings.json.bak.*`
 - `portfolio/confirmed_nav_snapshot.json`
 - `portfolio/realtime_snapshot.json`
+- `portfolio/prev_turnover.json`
 - `portfolio/transactions.json`
 - `portfolio/fund_sector_map.json`
 - `portfolio/update_log.json`
 - `portfolio/snapshots/*.json`
 - `.run/`
 
-也就是说：
+That means:
 
-- GitHub 上看到的是结构和示例
-- 你本机保留的是真实持仓
+- GitHub shows project structure and sample schemas
+- Your actual holdings stay private on your own machine
 
-## 本地运行
+## Quick Start
 
-### 1. 安装前提
+### 1. Requirements
 
 - macOS
 - Node.js
-- 支持本地 `swift + Vision` OCR
+- Local `swift + Vision` OCR support
 
-### 2. 初始化示例数据
-
-第一次克隆项目后运行：
+### 2. Clone and bootstrap example data
 
 ```bash
+git clone https://github.com/maybeemeng747-svg/fund-holdings-dashboard.git
+cd fund-holdings-dashboard
 npm run bootstrap-data
 ```
 
-这会把 `portfolio/*.example.json` 复制成你本地可用的 `portfolio/*.json`。
+This copies:
 
-### 3. 启动网站
+- `portfolio/current_holdings.example.json` -> `portfolio/current_holdings.json`
+- `portfolio/confirmed_nav_snapshot.example.json` -> `portfolio/confirmed_nav_snapshot.json`
+- `portfolio/realtime_snapshot.example.json` -> `portfolio/realtime_snapshot.json`
+- and the other example templates into local editable JSON files
+
+### 3. Start the dashboard
 
 ```bash
 npm start
 ```
 
-打开：
+Open:
 
 [http://localhost:3030](http://localhost:3030)
 
-## 截图导入流程
+To use an external holdings truth source, set:
 
-1. 打开网页看板
-2. 上传支付宝 / 养基宝持仓截图
-3. 点击“提取并生成预览”
-4. 检查结构化结果、缺失项、异常提示
-5. 人工确认后写入 `portfolio/current_holdings.json`
-6. 系统自动更新：
+```bash
+HOLDINGS_FILE="$HOME/.openclaw/workspace/portfolio/holdings.json" npm start
+```
+
+### Restore a code backup
+
+The GitHub repository contains code and example data only. Real holdings,
+transactions, snapshots, and local data backups are excluded and must be
+restored separately from your private storage. Set `HOLDINGS_FILE` to the
+restored holdings file before starting the dashboard.
+
+To reinstall the macOS background service using the current Node executable:
+
+```bash
+HOLDINGS_FILE="/absolute/path/to/holdings.json" zsh scripts/install-launch-agent.sh
+```
+
+Verify `http://localhost:3030/api/holdings` reports the intended `source_file`
+and holdings before using the restored dashboard.
+
+## Screenshot Import Workflow
+
+1. Open the local dashboard
+2. Click `导入`
+3. Upload an Alipay / Yangjibao holdings screenshot and click `提取并预览`
+4. Review OCR extraction, missing fields, suspicious fields, and diff
+5. Confirm before writing
+6. The app updates:
    - `portfolio/current_holdings.json`
    - `portfolio/confirmed_nav_snapshot.json`
    - `portfolio/update_log.json`
    - `portfolio/snapshots/*.json`
 
-## 数据口径
+## Dashboard Metrics
 
-### 基础持仓真源
+Top-level dashboard currently shows:
 
-- `portfolio/current_holdings.json`
-- 用来保存基金名称、代码、份额、成本等基础持仓信息
+- 今日涨幅
+- 今日收益
+- 基金总持仓金额
+- 确认总收益
 
-### 当前真实仓位
+Each fund card shows:
 
-- `portfolio/confirmed_nav_snapshot.json`
-- 用来保存最新确认净值口径下的真实仓位
+- Fund name
+- Intraday estimated change
+- Daily profit
+- Extra status badges such as `已更新` or `黄金夜盘中`
 
-### 盘中实时估算
+Each fund detail row shows:
 
-- `portfolio/realtime_snapshot.json`
-- 用来保存今日盘中估算涨幅和当日收益
+- Fund name / code
+- Current holding amount
+- Shares
+- Cost NAV
+- Latest NAV
+- Confirmed holding profit
+- Confirmed holding profit rate
+- Portfolio weight
 
-## Agent 读取规则
+## Agent Read Order
 
-请优先遵守：
+Please refer to:
 
 - [AGENTS.md](./AGENTS.md)
 - [.agents/skills/read-current-holdings/SKILL.md](./.agents/skills/read-current-holdings/SKILL.md)
 
-推荐读取顺序：
+Recommended read order:
 
 1. `portfolio/current_holdings.json`
 2. `portfolio/confirmed_nav_snapshot.json`
 3. `portfolio/realtime_snapshot.json`
 4. `portfolio/fund_sector_map.json`
 
-## 测试
+## Tests
 
 ```bash
 npm test
 ```
 
-## 发布到 GitHub
+## Suggested GitHub Topics
 
-如果你从来没发过 GitHub，最简单就是按下面做。
+You can add these topics on the GitHub repository page:
 
-### 1. 先在 GitHub 网站创建一个空仓库
+- `fund-dashboard`
+- `portfolio-tracker`
+- `json-source-of-truth`
+- `ocr`
+- `investment-tools`
+- `nodejs`
+- `local-first`
+- `fund-investing`
 
-建议仓库名：
+## Limitations
 
-- `fund-holdings-dashboard`
-- 或 `fund-json-dashboard`
+- OCR depends on macOS Vision and is not cross-platform
+- Active mixed funds use estimated intraday proxies, not official realtime NAV
+- QDII realtime confidence is lower than domestic A-share funds
+- The project is optimized for local personal use, not multi-user cloud deployment
 
-创建时：
+## License
 
-- 选 `Public`
-- 不要勾选自动创建 README
-- 不要勾选 `.gitignore`
-
-### 2. 在本地初始化 Git
-
-在项目目录运行：
-
-```bash
-git init
-git add .
-git commit -m "Initial public release"
-```
-
-### 3. 绑定远程仓库
-
-把下面的地址换成你自己的：
-
-```bash
-git remote add origin https://github.com/你的用户名/你的仓库名.git
-git branch -M main
-git push -u origin main
-```
-
-### 4. 以后更新项目
-
-每次修改后运行：
-
-```bash
-git add .
-git commit -m "Update dashboard"
-git push
-```
-
-## 建议你公开前再检查一次
-
-重点检查：
-
-- 不要把真实持仓 JSON 加进 Git
-- 不要把 `.run/` 日志加进 Git
-- 不要把你本机的绝对路径写进文档
-
-可以用这条命令快速检查：
-
-```bash
-git status --short
-```
-
-## 当前限制
-
-- OCR 依赖 macOS Vision，不是跨平台实现
-- 主动混合基金的盘中估算不是官方净值，只是估算
-- QDII 的实时估算可信度低于普通 A 股基金
-- 默认更适合本地个人使用，不是多用户云服务
+[MIT](./LICENSE)

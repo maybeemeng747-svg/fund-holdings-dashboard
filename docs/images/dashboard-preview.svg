@@ -1,0 +1,51 @@
+<svg width="1400" height="900" viewBox="0 0 1400 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="900" fill="#F7F5EE"/>
+  <rect x="40" y="32" width="1320" height="96" rx="28" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="76" y="70" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="22" letter-spacing="2">PORTFOLIO JSON SOURCE OF TRUTH</text>
+  <text x="76" y="108" fill="#1F2A22" font-family="Arial, sans-serif" font-size="44" font-weight="700">基金持仓看板</text>
+
+  <rect x="40" y="152" width="1320" height="124" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <rect x="64" y="176" width="290" height="76" rx="20" fill="#E3F1ED"/>
+  <text x="86" y="206" fill="#6E6F61" font-family="Arial, sans-serif" font-size="22">今日涨幅</text>
+  <text x="86" y="240" fill="#1F2A22" font-family="Arial, sans-serif" font-size="38" font-weight="700">+0.85%</text>
+  <rect x="376" y="176" width="290" height="76" rx="20" fill="#FFF7F7"/>
+  <text x="398" y="206" fill="#6E6F61" font-family="Arial, sans-serif" font-size="22">今日收益</text>
+  <text x="398" y="240" fill="#1F2A22" font-family="Arial, sans-serif" font-size="38" font-weight="700">+125.30</text>
+  <rect x="688" y="176" width="290" height="76" rx="20" fill="#FFF7F7"/>
+  <text x="710" y="206" fill="#6E6F61" font-family="Arial, sans-serif" font-size="22">基金总持仓金额</text>
+  <text x="710" y="240" fill="#1F2A22" font-family="Arial, sans-serif" font-size="38" font-weight="700">12,345.67</text>
+  <rect x="1000" y="176" width="336" height="76" rx="20" fill="#FFF7F7"/>
+  <text x="1022" y="206" fill="#6E6F61" font-family="Arial, sans-serif" font-size="22">确认总收益</text>
+  <text x="1022" y="240" fill="#1F2A22" font-family="Arial, sans-serif" font-size="38" font-weight="700">+456.78</text>
+
+  <rect x="40" y="300" width="1320" height="560" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="68" y="346" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="20" letter-spacing="2">HOLDINGS</text>
+  <text x="68" y="386" fill="#1F2A22" font-family="Arial, sans-serif" font-size="34" font-weight="700">基金热力图 + 持仓明细</text>
+
+  <rect x="68" y="416" width="520" height="212" rx="18" fill="#E98B92" stroke="#B83F47"/>
+  <text x="92" y="462" fill="#18120F" font-family="Arial, sans-serif" font-size="34" font-weight="700">示例成长基金A</text>
+  <text x="92" y="506" fill="#18120F" font-family="Arial, sans-serif" font-size="24" font-weight="700">今日估算涨幅</text>
+  <text x="92" y="560" fill="#18120F" font-family="Arial, sans-serif" font-size="64" font-weight="700">-0.52%</text>
+  <text x="92" y="602" fill="#18120F" font-family="Arial, sans-serif" font-size="24" font-weight="700">当日收益</text>
+  <text x="92" y="644" fill="#18120F" font-family="Arial, sans-serif" font-size="46" font-weight="700">-45.20</text>
+
+  <rect x="608" y="416" width="342" height="212" rx="18" fill="#88C58E" stroke="#528F5D"/>
+  <text x="632" y="462" fill="#18120F" font-family="Arial, sans-serif" font-size="30" font-weight="700">示例稳健基金B</text>
+  <text x="632" y="506" fill="#18120F" font-family="Arial, sans-serif" font-size="22" font-weight="700">今日估算涨幅</text>
+  <text x="632" y="554" fill="#18120F" font-family="Arial, sans-serif" font-size="52" font-weight="700">+0.63%</text>
+  <text x="632" y="594" fill="#18120F" font-family="Arial, sans-serif" font-size="22" font-weight="700">当日收益</text>
+  <text x="632" y="634" fill="#18120F" font-family="Arial, sans-serif" font-size="36" font-weight="700">+38.40</text>
+
+  <rect x="968" y="416" width="368" height="212" rx="18" fill="#E98B92" stroke="#B83F47"/>
+  <text x="992" y="462" fill="#18120F" font-family="Arial, sans-serif" font-size="30" font-weight="700">示例主题基金C</text>
+  <text x="992" y="506" fill="#18120F" font-family="Arial, sans-serif" font-size="22" font-weight="700">今日估算涨幅</text>
+  <text x="992" y="554" fill="#18120F" font-family="Arial, sans-serif" font-size="52" font-weight="700">+1.28%</text>
+  <text x="992" y="594" fill="#18120F" font-family="Arial, sans-serif" font-size="22" font-weight="700">当日收益</text>
+  <text x="992" y="634" fill="#18120F" font-family="Arial, sans-serif" font-size="36" font-weight="700">+82.15</text>
+
+  <rect x="68" y="654" width="1268" height="178" rx="18" fill="#F7F5EE" stroke="#D9D0BC"/>
+  <text x="92" y="696" fill="#1F2A22" font-family="Arial, sans-serif" font-size="28" font-weight="700">持仓明细列表</text>
+  <text x="92" y="734" fill="#6E6F61" font-family="Arial, sans-serif" font-size="22">基金名称 / 代码 / 持仓金额 / 份额 / 成本价 / 净值 / 确认总收益</text>
+  <text x="92" y="778" fill="#1F2A22" font-family="Arial, sans-serif" font-size="24">示例主题基金C · 000003 · 3,456.78 · 2,345.67 · 1.2345 · 1.4567 · +321.09</text>
+  <text x="92" y="812" fill="#1F2A22" font-family="Arial, sans-serif" font-size="24">示例成长基金A · 000001 · 4,567.89 · 3,210.00 · 1.3456 · 1.4230 · +248.60</text>
+</svg>

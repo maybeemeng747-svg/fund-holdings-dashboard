@@ -6,6 +6,7 @@ import { spawn } from "node:child_process";
 import { getCurrentHoldings } from "./portfolio-store.js";
 import { buildImportAdvisories, HIGH_PRIORITY_MISSING_FIELDS } from "./import-quality.js";
 import { paths } from "./config.js";
+import { mergeFundHoldings } from "./portfolio-merge.js";
 
 const DIFF_TOLERANCES = {
   amount: 0.5,
@@ -15,14 +16,35 @@ const DIFF_TOLERANCES = {
 
 const FIELD_RULES = [
   { key: "fund_code", labels: ["基金代码", "代码"] },
-  { key: "market_value", labels: ["持仓金额", "持仓市值", "市值", "持仓"] },
+  { key: "market_value", labels: ["持仓金额", "持仓市值", "持有金额", "市值", "持仓"] },
   { key: "shares", labels: ["持有份额", "持仓份额", "份额"] },
-  { key: "cost_nav", labels: ["成本价", "持仓成本", "平均成本"] },
+  { key: "cost_nav", labels: ["成本价", "持有成本", "持仓成本", "平均成本"] },
   { key: "latest_nav", labels: ["最新净值", "净值"] },
   { key: "daily_change_pct", labels: ["日涨幅", "日增长率", "涨跌幅"] },
   { key: "yesterday_profit", labels: ["昨日收益", "昨日盈亏"] },
   { key: "holding_profit", labels: ["持有收益", "持仓收益", "累计收益"] },
   { key: "holding_profit_rate", labels: ["持有收益率", "持仓收益率", "收益率"] },
+];
+
+const NON_FUND_TITLE_PATTERNS = [
+  /^资产详情$/,
+  /^详情$/,
+  /^当前持有/,
+  /^收益明细$/,
+  /^交易记录$/,
+  /^我的定投/,
+  /^累计盈亏$/,
+  /^业绩走势$/,
+  /^讨论区$/,
+  /^财富号$/,
+  /^卖出$/,
+  /^买入$/,
+  /^定投$/,
+  /^产品详情$/,
+  /^提供机构$/,
+  /^交易规则$/,
+  /^费率.*交易时间/,
+  /^三心$/,
 ];
 
 function formatNowLocal() {
@@ -113,6 +135,9 @@ function extractFieldFromText(text, field) {
 
 function isProbableFundName(line) {
   if (!line) return false;
+  if (NON_FUND_TITLE_PATTERNS.some((pattern) => pattern.test(line))) {
+    return false;
+  }
   if (/^(基金代码|持仓金额|持仓市值|市值|持有份额|份额|成本价|最新净值|日涨幅|涨跌幅|昨日收益|昨日盈亏|持有收益|收益率)/.test(line)) {
     return false;
   }
@@ -219,6 +244,61 @@ function parseHoldingBlock(block, rawObservations) {
     holding.suspicious_fields.push("action_confidence_degraded");
   }
 
+  return holding;
+}
+
+function hasMeaningfulNumericField(holding) {
+  return [
+    "market_value",
+    "shares",
+    "cost_nav",
+    "latest_nav",
+    "daily_change_pct",
+    "yesterday_profit",
+    "holding_profit",
+    "holding_profit_rate",
+  ].some((field) => holding[field] !== null);
+}
+
+function canonicalizeHolding(holding, currentHoldings) {
+  const currentByCode = new Map((currentHoldings.holdings || []).map((item) => [item.fund_code, item]));
+  const currentByName = new Map((currentHoldings.holdings || []).map((item) => [item.fund_name, item]));
+
+  if (holding.fund_code && currentByCode.has(holding.fund_code)) {
+    const matched = currentByCode.get(holding.fund_code);
+    holding.fund_name = matched.fund_name;
+    return holding;
+  }
+
+  if (holding.fund_name && currentByName.has(holding.fund_name)) {
+    const matched = currentByName.get(holding.fund_name);
+    holding.fund_code = holding.fund_code || matched.fund_code;
+  }
+
+  return holding;
+}
+
+function buildSingleFundDetailHolding(uniqueLines, currentHoldings) {
+  const joinedText = uniqueLines.map((item) => item.text).join(" ");
+  const currentByCode = new Map((currentHoldings.holdings || []).map((item) => [item.fund_code, item]));
+  const currentNames = (currentHoldings.holdings || []).map((item) => item.fund_name).filter(Boolean);
+  const codeMatch = joinedText.match(/\b\d{6}\b/);
+  const matchedByCode = codeMatch ? currentByCode.get(codeMatch[0]) : null;
+  const matchedByName = currentNames.find((name) => joinedText.includes(name)) || null;
+  const matched = matchedByCode || (matchedByName ? (currentHoldings.holdings || []).find((item) => item.fund_name === matchedByName) : null);
+
+  if (!matched) return null;
+
+  const holding = parseHoldingBlock(
+    {
+      fund_name: matched.fund_name,
+      lines: uniqueLines.map((item) => item.text),
+    },
+    uniqueLines,
+  );
+
+  holding.fund_code = matched.fund_code || holding.fund_code;
+  holding.fund_name = matched.fund_name;
   return holding;
 }
 
@@ -343,7 +423,14 @@ export function validateImportPayload(payload) {
   if (!Array.isArray(payload.holdings) || payload.holdings.length === 0) {
     throw new Error("确认写入时 holdings 不能为空");
   }
+  if (
+    payload.import_scope === "partial" &&
+    payload.holdings.some((item) => !item?.fund_code && !item?.fund_name)
+  ) {
+    throw new Error("局部导入必须包含基金代码或基金名称");
+  }
 }
+
 
 export async function extractPortfolioFromScreenshot({ imageDataUrl, imageName }) {
   if (!imageDataUrl) {
@@ -368,10 +455,20 @@ export async function extractPortfolioFromScreenshot({ imageDataUrl, imageName }
     uniqueLines.push(line);
   }
 
-  const blocks = segmentBlocks(uniqueLines.map((item) => item.text));
-  const holdings = blocks.map((block) => parseHoldingBlock(block, uniqueLines)).filter((item) => {
-    return item.fund_name || item.market_value !== null || item.holding_profit !== null;
-  });
+  const currentHoldings = await getCurrentHoldings();
+  const detailPageHolding = buildSingleFundDetailHolding(uniqueLines, currentHoldings);
+
+  let holdings;
+  if (detailPageHolding) {
+    holdings = [canonicalizeHolding(detailPageHolding, currentHoldings)];
+  } else {
+    const blocks = segmentBlocks(uniqueLines.map((item) => item.text));
+    holdings = blocks
+      .map((block) => canonicalizeHolding(parseHoldingBlock(block, uniqueLines), currentHoldings))
+      .filter((item) => {
+        return item.fund_code || hasMeaningfulNumericField(item);
+      });
+  }
 
   if (holdings.length === 0) {
     holdings.push({
@@ -392,10 +489,13 @@ export async function extractPortfolioFromScreenshot({ imageDataUrl, imageName }
     });
   }
 
-  const currentHoldings = await getCurrentHoldings();
-  const diff = buildDiff(currentHoldings, holdings);
+  const importScope = detailPageHolding ? "partial" : "full";
+  const previewHoldings = importScope === "partial"
+    ? mergeFundHoldings(currentHoldings.holdings || [], holdings)
+    : holdings;
+  const diff = buildDiff(currentHoldings, previewHoldings);
   const advisory = buildImportAdvisories(holdings);
-  const portfolioLevel = summarizePortfolioLevelAlerts(currentHoldings, holdings, diff);
+  const portfolioLevel = summarizePortfolioLevelAlerts(currentHoldings, previewHoldings, diff);
   const warnings = [...advisory.warnings, ...portfolioLevel.alerts];
 
   return {
@@ -422,6 +522,7 @@ export async function extractPortfolioFromScreenshot({ imageDataUrl, imageName }
       })),
     },
     holdings,
+    import_scope: importScope,
     warnings,
     advisory,
     portfolio_level: portfolioLevel,

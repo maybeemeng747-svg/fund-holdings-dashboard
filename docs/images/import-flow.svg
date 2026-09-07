@@ -1,0 +1,31 @@
+<svg width="1400" height="480" viewBox="0 0 1400 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1400" height="480" fill="#F7F5EE"/>
+  <text x="60" y="72" fill="#1F2A22" font-family="Arial, sans-serif" font-size="40" font-weight="700">Screenshot Import Flow</text>
+  <text x="60" y="112" fill="#6E6F61" font-family="Arial, sans-serif" font-size="24">Upload → OCR → Preview → Diff → Confirm → JSON Source of Truth → Snapshot + Update Log</text>
+
+  <rect x="60" y="170" width="160" height="150" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="93" y="236" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="26" font-weight="700">1. 上传截图</text>
+
+  <rect x="260" y="170" width="160" height="150" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="293" y="236" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="26" font-weight="700">2. OCR 提取</text>
+
+  <rect x="460" y="170" width="160" height="150" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="493" y="236" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="26" font-weight="700">3. 预览校对</text>
+
+  <rect x="660" y="170" width="160" height="150" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="694" y="236" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="26" font-weight="700">4. 差异比对</text>
+
+  <rect x="860" y="170" width="160" height="150" rx="24" fill="#FFFDF7" stroke="#D9D0BC"/>
+  <text x="880" y="236" fill="#0F7B6C" font-family="Arial, sans-serif" font-size="26" font-weight="700">5. 人工确认</text>
+
+  <rect x="1060" y="170" width="280" height="150" rx="24" fill="#E3F1ED" stroke="#0F7B6C"/>
+  <text x="1093" y="222" fill="#1F2A22" font-family="Arial, sans-serif" font-size="26" font-weight="700">6. 更新 JSON 真源</text>
+  <text x="1093" y="260" fill="#1F2A22" font-family="Arial, sans-serif" font-size="22">current_holdings.json</text>
+  <text x="1093" y="294" fill="#1F2A22" font-family="Arial, sans-serif" font-size="22">confirmed_nav_snapshot.json</text>
+
+  <path d="M220 245H250" stroke="#0F7B6C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M420 245H450" stroke="#0F7B6C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M620 245H650" stroke="#0F7B6C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M820 245H850" stroke="#0F7B6C" stroke-width="8" stroke-linecap="round"/>
+  <path d="M1020 245H1050" stroke="#0F7B6C" stroke-width="8" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,169 @@
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --dim: #8b949e;
+  --accent: #ffd700;
+  --danger: #ff6b6b;
+  --success: #66eeaa;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "PingFang SC", sans-serif;
+}
+
+.import-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px max(18px, calc((100vw - 900px) / 2));
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.import-header h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.back-link {
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1;
+  text-decoration: none;
+}
+
+main {
+  width: min(900px, 100%);
+  margin: 0 auto;
+}
+
+.import-band,
+.preview-band {
+  padding: 22px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.file-picker {
+  display: grid;
+  gap: 6px;
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.file-picker strong {
+  color: var(--dim);
+  overflow-wrap: anywhere;
+}
+
+#screenshot-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+button {
+  min-height: 44px;
+  margin-top: 14px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #111;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.status {
+  min-height: 24px;
+  margin: 12px 0 0;
+  color: var(--dim);
+}
+
+.status[data-type="error"] { color: var(--danger); }
+.status[data-type="success"] { color: var(--success); }
+
+.preview-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.preview-heading h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+#import-scope,
+.diff-summary {
+  color: var(--dim);
+  font-size: 14px;
+}
+
+.warnings {
+  padding-left: 20px;
+  color: var(--danger);
+}
+
+label[for="holdings-json"] {
+  display: block;
+  margin: 18px 0 8px;
+  font-weight: 700;
+}
+
+textarea,
+pre {
+  width: 100%;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #090c10;
+  color: var(--text);
+  font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+  overflow: auto;
+}
+
+details { margin-top: 16px; }
+summary { cursor: pointer; color: var(--dim); }
+pre { max-height: 260px; margin-top: 10px; white-space: pre-wrap; }
+
+.confirm-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.confirm-row input {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 520px) {
+  .preview-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  button { width: 100%; }
+}
