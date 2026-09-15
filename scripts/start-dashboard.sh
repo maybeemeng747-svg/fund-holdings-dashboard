@@ -9,5 +9,6 @@ LOG_DIR="$ROOT_DIR/.run"
 mkdir -p "$LOG_DIR"
 cd "$ROOT_DIR"
 export HOLDINGS_FILE="${HOLDINGS_FILE:-$HOME/.openclaw/workspace/portfolio/holdings.json}"
+export TUSHARE_ENV_FILE="${TUSHARE_ENV_FILE:-$HOME/TradingAgents-AShare/.env}"
 
 exec "$NODE_BIN" server.js >>"$LOG_DIR/server.stdout.log" 2>>"$LOG_DIR/server.stderr.log"

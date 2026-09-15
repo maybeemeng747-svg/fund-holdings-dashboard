@@ -164,10 +164,15 @@ async function handleApi(req, res) {
     try {
       const holdings = await getCurrentHoldings();
       const stockItems = holdings.stocks || (holdings.holdings || []).filter(h => h._is_stock || h.stock_code);
-      const quotes = await fetchStockRealtime(stockItems);
-      sendJson(res, 200, { quotes });
+      const watchlistItems = (holdings.workspace_meta?.watchlist || holdings.watchlist || [])
+        .filter(item => item?.code || item?.stock_code || item?.fund_code)
+        .slice(0, 5);
+      const allQuotes = await fetchStockRealtime([...stockItems, ...watchlistItems]);
+      const quotes = allQuotes.slice(0, stockItems.length);
+      const watchlistQuotes = allQuotes.slice(stockItems.length);
+      sendJson(res, 200, { quotes, watchlist_quotes: watchlistQuotes });
     } catch (error) {
-      sendJson(res, 200, { quotes: [] });
+      sendJson(res, 200, { quotes: [], watchlist_quotes: [] });
     }
     return;
   }

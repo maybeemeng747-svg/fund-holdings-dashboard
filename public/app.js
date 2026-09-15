@@ -31,6 +31,7 @@ function fmtMoney(v) {
 
 function fmtPct(v) { return (v > 0 ? '+' : '') + v.toFixed(2) + '%'; }
 function fmtPnl(v) { return (v > 0 ? '+' : '') + fmtMoney(v); }
+function fmtMa(v) { return Number.isFinite(v) ? v.toFixed(2) : '--'; }
 
 let summaryValuesHidden = false;
 let summaryTotalText = '--';
@@ -199,6 +200,7 @@ function renderTreemap(container, tiles, type) {
       html += `<div class="tile-name" title="${name}">${sn}</div>`;
       html += `<div class="stock-daily-change" style="color:${getColor(pct)}">${fmtPct(pct)}</div>`;
       html += `<div class="stock-current-price">现价 ${price > 0 ? price.toFixed(2) : '--'}</div>`;
+      html += `<div class="stock-ma">MA5 ${fmtMa(d.ma5)} · MA20 ${fmtMa(d.ma20)}</div>`;
 
       tile.innerHTML = html;
       container.appendChild(tile);
@@ -328,6 +330,7 @@ async function fetchSnapshot() {
 
 // Cache last successful stock quotes for offline fallback
 let _lastStockQuotes = [];
+let _lastWatchlistQuotes = [];
 let _stockQuotesStale = false;
 
 async function fetchStockQuotes() {
@@ -336,16 +339,56 @@ async function fetchStockQuotes() {
     if (!r.ok) throw new Error('Stock API error');
     const d = await r.json();
     const quotes = d.quotes || [];
+    const watchlistQuotes = (d.watchlist_quotes || []).slice(0, 5);
     if (quotes.length > 0) {
       _lastStockQuotes = quotes;
-      _stockQuotesStale = quotes.some((quote) => quote.quote_status !== 'realtime');
     }
-    return quotes;
+    _lastWatchlistQuotes = watchlistQuotes;
+    _stockQuotesStale = [...quotes, ...watchlistQuotes]
+      .some((quote) => quote.quote_status !== 'realtime');
+    return { quotes, watchlistQuotes };
   } catch (err) {
     console.warn('Stock quotes fetch failed, using cached data:', err.message);
     _stockQuotesStale = true;
-    return _lastStockQuotes;
+    return { quotes: _lastStockQuotes, watchlistQuotes: _lastWatchlistQuotes };
   }
+}
+
+function renderWatchlist(quotes) {
+  const grid = document.getElementById('watchlist-grid');
+  const items = (quotes || []).slice(0, 5);
+  grid.innerHTML = '';
+
+  for (let index = 0; index < 5; index += 1) {
+    const quote = items[index];
+    const cell = document.createElement('div');
+    cell.className = quote ? 'watchlist-cell' : 'watchlist-cell is-empty';
+
+    if (!quote) {
+      cell.textContent = '待添加';
+    } else {
+      const name = document.createElement('div');
+      const pct = document.createElement('div');
+      const price = document.createElement('div');
+      const averages = document.createElement('div');
+      const change = quote.display_daily_change_pct || 0;
+
+      name.className = 'watchlist-name';
+      name.textContent = shortName(quote.display_name || quote.stock_name || '');
+      name.title = quote.display_name || quote.stock_name || '';
+      pct.className = 'watchlist-change';
+      pct.style.color = getColor(change);
+      pct.textContent = fmtPct(change);
+      price.className = 'watchlist-price';
+      price.textContent = `现价 ${quote.current_price > 0 ? quote.current_price.toFixed(2) : '--'}`;
+      averages.className = 'watchlist-ma';
+      averages.innerHTML = `<span>MA5 ${fmtMa(quote.ma5)}</span><span>MA20 ${fmtMa(quote.ma20)}</span>`;
+      cell.append(name, pct, price, averages);
+    }
+    grid.appendChild(cell);
+  }
+
+  document.getElementById('watchlist-count').textContent = `${items.length}/5`;
 }
 
 async function fetchPolysilicon() {
@@ -375,7 +418,7 @@ function fmtTurnover(value) {
 
 // ===== Main =====
 async function render() {
-  const [snapshot, stockQuotes, polysilicon, marketSummary] = await Promise.all([
+  const [snapshot, stockQuoteData, polysilicon, marketSummary] = await Promise.all([
     fetchSnapshot(),
     fetchStockQuotes(),
     fetchPolysilicon(),
@@ -386,6 +429,8 @@ async function render() {
     document.getElementById('data-status').textContent = '⚠️ 数据加载失败';
     return;
   }
+
+  const stockQuotes = stockQuoteData.quotes;
 
   const summary = snapshot.summary || {};
   const holdings = snapshot.holdings || [];
@@ -505,6 +550,7 @@ async function render() {
 
   renderTreemap(fundTm, fundItems, 'fund');
   renderTreemap(stockTm, stockItems, 'stock');
+  renderWatchlist(stockQuoteData.watchlistQuotes);
 }
 
 // ===== Auto refresh =====

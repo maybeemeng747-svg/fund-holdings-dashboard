@@ -18,6 +18,8 @@
     <dict>
       <key>HOLDINGS_FILE</key>
       <string>__HOLDINGS_FILE__</string>
+      <key>TUSHARE_ENV_FILE</key>
+      <string>__TUSHARE_ENV_FILE__</string>
     </dict>
 
     <key>RunAtLoad</key>

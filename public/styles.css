@@ -184,6 +184,79 @@ html, body {
   max-height: 50%;
 }
 
+#watchlist-section {
+  flex: 0 0 35%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
+  background: rgba(13, 17, 23, 0.96);
+  overflow: hidden;
+}
+
+.watchlist-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  flex: 1;
+  min-height: 0;
+}
+
+.watchlist-cell {
+  min-width: 0;
+  padding: 9px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-right: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.025);
+  overflow: hidden;
+}
+
+.watchlist-cell:last-child { border-right: 0; }
+
+.watchlist-cell.is-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #59616c;
+  font-size: 12px;
+}
+
+.watchlist-name {
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 750;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.watchlist-change {
+  margin-top: 2px;
+  font-size: 23px;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.watchlist-price {
+  color: var(--text-dim);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.watchlist-ma {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 4px;
+  color: #b1bac4;
+  font-size: 12px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 .section-label {
   font-size: 14px;
   font-weight: 700;
@@ -266,6 +339,17 @@ html, body {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+
+.stock-ma {
+  max-width: 100%;
+  margin-top: 4px;
+  color: rgba(230, 237, 243, 0.72);
+  font-size: clamp(10px, min(10cqi, 11cqb), 16px);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: normal;
+  line-height: 1.15;
 }
 
 .tile-badge {
@@ -430,6 +514,11 @@ html, body {
 
 /* ===== 小屏适配 ===== */
 @media (max-height: 700px) {
+  .watchlist-cell { padding-block: 7px; }
+  .watchlist-name { font-size: 16px; }
+  .watchlist-change { font-size: 20px; }
+  .watchlist-price { font-size: 12px; }
+  .watchlist-ma { font-size: 11px; gap: 7px; }
   .tile .tile-name { font-size: 18px; }
   .tile .tile-code { font-size: 11px; }
   .tile .tile-pct { font-size: 28px; margin-top: 0; }
@@ -498,6 +587,12 @@ html, body {
   .fund-area .tile .tile-sub {
     display: none;
   }
+
+  .watchlist-cell { padding-inline: 3px; }
+  .watchlist-name { font-size: 15px; }
+  .watchlist-change { font-size: 18px; }
+  .watchlist-price { font-size: 11px; }
+  .watchlist-ma { flex-direction: column; gap: 0; margin-top: 2px; font-size: 10px; }
 }
 
 @media (min-width: 521px) and (max-width: 900px) {
