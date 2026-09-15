@@ -200,7 +200,7 @@ function renderTreemap(container, tiles, type) {
       html += `<div class="tile-name" title="${name}">${sn}</div>`;
       html += `<div class="stock-daily-change" style="color:${getColor(pct)}">${fmtPct(pct)}</div>`;
       html += `<div class="stock-current-price">现价 ${price > 0 ? price.toFixed(2) : '--'}</div>`;
-      html += `<div class="stock-ma">MA5 ${fmtMa(d.ma5)} · MA20 ${fmtMa(d.ma20)}</div>`;
+      html += `<div class="stock-ma"><span class="ma5-value">MA5 ${fmtMa(d.ma5)}</span><span class="ma-separator">·</span><span class="ma20-value">MA20 ${fmtMa(d.ma20)}</span></div>`;
 
       tile.innerHTML = html;
       container.appendChild(tile);
@@ -382,7 +382,7 @@ function renderWatchlist(quotes) {
       price.className = 'watchlist-price';
       price.textContent = `现价 ${quote.current_price > 0 ? quote.current_price.toFixed(2) : '--'}`;
       averages.className = 'watchlist-ma';
-      averages.innerHTML = `<span>MA5 ${fmtMa(quote.ma5)}</span><span>MA20 ${fmtMa(quote.ma20)}</span>`;
+      averages.innerHTML = `<span class="ma5-value">MA5 ${fmtMa(quote.ma5)}</span><span class="ma20-value">MA20 ${fmtMa(quote.ma20)}</span>`;
       cell.append(name, pct, price, averages);
     }
     grid.appendChild(cell);

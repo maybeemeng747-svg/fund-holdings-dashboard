@@ -190,7 +190,7 @@ html, body {
   display: flex;
   flex-direction: column;
   border-top: 1px solid var(--border);
-  background: rgba(13, 17, 23, 0.96);
+  background: #050608;
   overflow: hidden;
 }
 
@@ -208,8 +208,8 @@ html, body {
   flex-direction: column;
   justify-content: center;
   text-align: center;
-  border-right: 1px solid rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.025);
+  border-right: 1px solid #343b44;
+  background: #090c10;
   overflow: hidden;
 }
 
@@ -219,14 +219,15 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #59616c;
-  font-size: 14px;
+  color: #9aa4af;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 .watchlist-name {
-  color: var(--text);
-  font-size: 21px;
-  font-weight: 750;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -234,14 +235,15 @@ html, body {
 
 .watchlist-change {
   margin-top: 2px;
-  font-size: 27px;
-  font-weight: 850;
+  font-size: 31px;
+  font-weight: 950;
   font-variant-numeric: tabular-nums;
 }
 
 .watchlist-price {
-  color: var(--text-dim);
-  font-size: 16px;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
@@ -250,12 +252,22 @@ html, body {
   justify-content: center;
   gap: 10px;
   margin-top: 4px;
-  color: #b1bac4;
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 15px;
+  font-weight: 850;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+.watchlist-name,
+.watchlist-price,
+.watchlist-ma,
+.stock-ma {
+  text-shadow: 0 1px 3px #000000, 0 0 6px rgba(0,0,0,0.9);
+}
+
+.ma5-value { color: #72c7ff; }
+.ma20-value { color: #ffd95a; }
+.ma-separator { color: #ffffff; }
 
 .section-label {
   font-size: 14px;
@@ -335,18 +347,22 @@ html, body {
   font-weight: 700;
   line-height: 1.2;
   margin-top: 2px;
-  color: var(--text);
+  color: #ffffff;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
   text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 
 .stock-ma {
+  width: 100%;
   max-width: 100%;
   margin-top: 4px;
-  color: rgba(230, 237, 243, 0.72);
-  font-size: clamp(10px, min(10cqi, 11cqb), 16px);
-  font-weight: 650;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0 0.42em;
+  font-size: clamp(11px, min(11cqi, 12cqb), 18px);
+  font-weight: 850;
   font-variant-numeric: tabular-nums;
   white-space: normal;
   line-height: 1.15;
@@ -515,10 +531,10 @@ html, body {
 /* ===== 小屏适配 ===== */
 @media (max-height: 700px) {
   .watchlist-cell { padding-block: 7px; }
-  .watchlist-name { font-size: 18px; }
-  .watchlist-change { font-size: 23px; }
-  .watchlist-price { font-size: 14px; }
-  .watchlist-ma { font-size: 12px; gap: 7px; }
+  .watchlist-name { font-size: 21px; }
+  .watchlist-change { font-size: 27px; }
+  .watchlist-price { font-size: 16px; }
+  .watchlist-ma { font-size: 13px; gap: 8px; }
   .tile .tile-name { font-size: 18px; }
   .tile .tile-code { font-size: 11px; }
   .tile .tile-pct { font-size: 28px; margin-top: 0; }
@@ -594,15 +610,15 @@ html, body {
   }
   .watchlist-cell {
     padding: 5px 4px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid #343b44;
   }
   .watchlist-cell:nth-child(3n) { border-right: 0; }
   .watchlist-cell:nth-child(n+4) { border-bottom: 0; }
-  .watchlist-cell.is-empty { font-size: 12px; }
-  .watchlist-name { font-size: 18px; }
-  .watchlist-change { font-size: 22px; }
-  .watchlist-price { font-size: 14px; }
-  .watchlist-ma { flex-direction: column; gap: 0; margin-top: 3px; font-size: 11px; }
+  .watchlist-cell.is-empty { font-size: 14px; }
+  .watchlist-name { font-size: 21px; }
+  .watchlist-change { font-size: 26px; }
+  .watchlist-price { font-size: 16px; }
+  .watchlist-ma { flex-direction: column; gap: 0; margin-top: 3px; font-size: 13px; }
 }
 
 @media (min-width: 521px) and (max-width: 900px) {
