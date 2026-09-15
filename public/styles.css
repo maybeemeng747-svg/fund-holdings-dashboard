@@ -220,12 +220,12 @@ html, body {
   align-items: center;
   justify-content: center;
   color: #59616c;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .watchlist-name {
   color: var(--text);
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 750;
   white-space: nowrap;
   overflow: hidden;
@@ -234,14 +234,14 @@ html, body {
 
 .watchlist-change {
   margin-top: 2px;
-  font-size: 23px;
+  font-size: 27px;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
 }
 
 .watchlist-price {
   color: var(--text-dim);
-  font-size: 14px;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -251,7 +251,7 @@ html, body {
   gap: 10px;
   margin-top: 4px;
   color: #b1bac4;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 650;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -515,10 +515,10 @@ html, body {
 /* ===== 小屏适配 ===== */
 @media (max-height: 700px) {
   .watchlist-cell { padding-block: 7px; }
-  .watchlist-name { font-size: 16px; }
-  .watchlist-change { font-size: 20px; }
-  .watchlist-price { font-size: 12px; }
-  .watchlist-ma { font-size: 11px; gap: 7px; }
+  .watchlist-name { font-size: 18px; }
+  .watchlist-change { font-size: 23px; }
+  .watchlist-price { font-size: 14px; }
+  .watchlist-ma { font-size: 12px; gap: 7px; }
   .tile .tile-name { font-size: 18px; }
   .tile .tile-code { font-size: 11px; }
   .tile .tile-pct { font-size: 28px; margin-top: 0; }
@@ -588,11 +588,21 @@ html, body {
     display: none;
   }
 
-  .watchlist-cell { padding-inline: 3px; }
-  .watchlist-name { font-size: 15px; }
-  .watchlist-change { font-size: 18px; }
-  .watchlist-price { font-size: 11px; }
-  .watchlist-ma { flex-direction: column; gap: 0; margin-top: 2px; font-size: 10px; }
+  .watchlist-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+  }
+  .watchlist-cell {
+    padding: 5px 4px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .watchlist-cell:nth-child(3n) { border-right: 0; }
+  .watchlist-cell:nth-child(n+4) { border-bottom: 0; }
+  .watchlist-cell.is-empty { font-size: 12px; }
+  .watchlist-name { font-size: 18px; }
+  .watchlist-change { font-size: 22px; }
+  .watchlist-price { font-size: 14px; }
+  .watchlist-ma { flex-direction: column; gap: 0; margin-top: 3px; font-size: 11px; }
 }
 
 @media (min-width: 521px) and (max-width: 900px) {
