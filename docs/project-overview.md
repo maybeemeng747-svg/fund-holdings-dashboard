@@ -62,6 +62,8 @@
 运行时可通过 `HOLDINGS_FILE` 指向外部真源；未设置时使用项目内的
 `portfolio/current_holdings.json`，因此新克隆执行 `npm run bootstrap-data` 后即可运行。
 
+其中 `watchlist` 是独立观察仓，不属于实际持仓更新范围。任何工具更新股票、基金或账户数据时，必须从写入前的真源中原样保留该字段；字段缺失或空数组不代表用户授权清空。只有用户明确要求调整观察仓时才可修改。
+
 #### `portfolio/confirmed_nav_snapshot.json`
 
 当前最准确的确认仓位基线，主要保存：

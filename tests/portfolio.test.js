@@ -163,6 +163,19 @@ test("dashboard import schema maps back to workspace holdings schema and recalcu
   assert.equal(payload.account.total_pnl, 0);
 });
 
+test("dashboard holdings updates preserve the existing watchlist", () => {
+  const watchlist = [
+    { code: "603629", name: "利通电子" },
+    { code: "603823", name: "百合花" },
+  ];
+  const payload = adaptDashboardPortfolioToWorkspace(
+    { holdings: { stocks: [], funds: [] }, watchlist },
+    [{ fund_code: "000001", fund_name: "示例基金", market_value: 100 }],
+  );
+
+  assert.deepEqual(payload.watchlist, watchlist);
+});
+
 test("confirm payload validation rejects unconfirmed writes", () => {
   assert.throws(() => validateImportPayload({ confirmed: false, holdings: [] }), /必须经过用户确认/);
 });

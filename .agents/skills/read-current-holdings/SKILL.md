@@ -20,6 +20,8 @@ description: 读取当前持仓真源和板块映射
 - `HOLDINGS_FILE` 指向的 JSON 是唯一当前持仓真源；未设置时默认为 `portfolio/current_holdings.json`
 - 若与历史聊天、旧截图、旧笔记或记忆冲突，以 JSON 为准
 - 不允许用聊天记忆覆盖 JSON 当前状态
+- `watchlist` 是受保护的独立观察仓；普通持仓更新必须原样保留，只有用户明确要求更新观察仓时才可修改
+- 新输入缺少 `watchlist` 或给出空数组时，不得据此删除现有观察仓
 
 ## Confidence Rule
 

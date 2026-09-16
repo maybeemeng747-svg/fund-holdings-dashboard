@@ -66,6 +66,7 @@ codex "先读取 AGENTS.md、docs/project-overview.md、docs/TASKS.md、docs/DEC
 ### 禁止操作
 - ❌ 删除 `portfolio/snapshots/` 目录及其内容
 - ❌ 覆盖 `portfolio/current_holdings.json` 中的真实持仓数据
+- ❌ 在更新股票、基金、账户或行情字段时修改、清空或删除 `watchlist`
 - ❌ 覆盖 `portfolio/transactions.json` 中的真实交易记录
 - ❌ 覆盖 `portfolio/fund_sector_map.json` 中的真实映射数据
 - ❌ 把测试数据写入真实持仓文件
@@ -77,6 +78,13 @@ codex "先读取 AGENTS.md、docs/project-overview.md、docs/TASKS.md、docs/DEC
 - ✅ 通过 `realtime_snapshot.json` 更新盘中估算
 - ✅ 在 `*.example.json` 文件中写测试数据
 - ✅ 修改源代码、样式、脚本、测试
+
+### 观察仓保护规则
+
+- `watchlist` 是独立于实际持仓的用户维护数据，不计入仓位和收益。
+- 任何持仓同步、截图导入、record / Open PRO 更新或整文件重写，都必须先读取旧值，并原样保留 `watchlist`。
+- 输入中缺少 `watchlist`，或输入里出现空数组，都不能视为清空授权。
+- 只有用户明确提出“新增、删除、替换或清空观察仓”时，才允许修改 `watchlist`。
 
 ### 数据源优先级（从高到低）
 1. `portfolio/confirmed_nav_snapshot.json` — 最准确的确认仓位基线

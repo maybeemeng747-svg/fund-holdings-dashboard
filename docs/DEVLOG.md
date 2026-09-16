@@ -319,3 +319,14 @@
   - `public/app.js` — 股票区和观察仓的 MA5/MA20 拆分为独立样式，分别使用亮蓝与亮黄
 - **数据安全**：仅修改前端结构和样式，未修改任何投资数据
 - **测试结果**：`npm test` 39 pass / 0 fail；390x844 与 1280x720 实测无文字或页面溢出，MA5/MA20 颜色与字号均按预期生效
+
+---
+
+## 2026-09-16 | 观察仓写入保护规则
+
+- **执行者**：Codex App
+- **任务**：防止 record、Open PRO 或其他持仓更新流程误删观察仓
+- **规则**：普通持仓更新必须原样保留旧 `watchlist`；字段缺失或空数组不视为清空授权；仅在用户明确要求时允许调整观察仓
+- **修改文件**：`AGENTS.md`、`.agents/skills/read-current-holdings/SKILL.md`、`docs/project-overview.md`、`docs/DECISIONS.md`、`tests/portfolio.test.js`
+- **数据恢复**：恢复此前由用户明确加入的利通电子和百合花；不修改其他真实持仓字段
+- **测试结果**：`npm test` 40 pass / 0 fail；看板 API 已重新读取两只观察股；恢复前快照保存在外部真源的 `snapshots/` 目录
