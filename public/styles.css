@@ -223,11 +223,13 @@ html, body {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-areas:
-    "name change"
-    "price averages";
+    "name name"
+    "change change"
+    "price price"
+    "averages averages";
   align-content: center;
   column-gap: 16px;
-  row-gap: 8px;
+  row-gap: 3px;
 }
 
 .watchlist-cell:last-child { border-right: 0; }
@@ -247,7 +249,7 @@ html, body {
   font-size: 32px;
   font-weight: 900;
   line-height: 1.1;
-  text-align: left;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -264,10 +266,10 @@ html, body {
 .watchlist-price {
   grid-area: price;
   color: #ffffff;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 800;
   line-height: 1.1;
-  text-align: left;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
@@ -276,7 +278,7 @@ html, body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  font-size: 17px;
+  font-size: 20px;
   font-weight: 850;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -557,7 +559,7 @@ html, body {
 .fund-area .tile.small .tile-sub { display: block; }
 
 /* ===== 小屏适配 ===== */
-@media (max-height: 700px) {
+@media (max-height: 520px) {
   .watchlist-cell { padding: 5px 4px; }
   .watchlist-cell:not(.is-empty) { column-gap: 10px; row-gap: 4px; }
   .watchlist-name { font-size: 21px; }
