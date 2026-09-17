@@ -197,7 +197,7 @@ html, body {
 .watchlist-grid {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: 50%;
+  grid-auto-columns: 25%;
   grid-template-rows: minmax(0, 1fr);
   flex: 1;
   min-height: 0;
@@ -237,14 +237,14 @@ html, body {
   align-items: center;
   justify-content: center;
   color: #9aa4af;
-  font-size: 24px;
+  font-size: 17px;
   font-weight: 700;
 }
 
 .watchlist-name {
   grid-area: name;
   color: #ffffff;
-  font-size: 46px;
+  font-size: 32px;
   font-weight: 900;
   line-height: 1.1;
   text-align: left;
@@ -255,7 +255,7 @@ html, body {
 
 .watchlist-change {
   grid-area: change;
-  font-size: 58px;
+  font-size: 41px;
   font-weight: 950;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -264,7 +264,7 @@ html, body {
 .watchlist-price {
   grid-area: price;
   color: #ffffff;
-  font-size: 32px;
+  font-size: 22px;
   font-weight: 800;
   line-height: 1.1;
   text-align: left;
@@ -276,7 +276,7 @@ html, body {
   display: flex;
   justify-content: center;
   gap: 10px;
-  font-size: 24px;
+  font-size: 17px;
   font-weight: 850;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -560,10 +560,10 @@ html, body {
 @media (max-height: 700px) {
   .watchlist-cell { padding: 5px 4px; }
   .watchlist-cell:not(.is-empty) { column-gap: 10px; row-gap: 4px; }
-  .watchlist-name { font-size: 30px; }
-  .watchlist-change { font-size: 38px; }
-  .watchlist-price { font-size: 22px; }
-  .watchlist-ma { font-size: 17px; gap: 7px; }
+  .watchlist-name { font-size: 21px; }
+  .watchlist-change { font-size: 27px; }
+  .watchlist-price { font-size: 15px; }
+  .watchlist-ma { font-size: 12px; gap: 7px; }
   .tile .tile-name { font-size: 18px; }
   .tile .tile-code { font-size: 11px; }
   .tile .tile-pct { font-size: 28px; margin-top: 0; }
@@ -634,7 +634,7 @@ html, body {
   }
 
   .watchlist-grid {
-    grid-auto-columns: 100%;
+    grid-auto-columns: 50%;
   }
   .watchlist-cell {
     padding: 5px 4px;
@@ -652,11 +652,13 @@ html, body {
   .watchlist-cell.is-empty { font-size: 22px; }
   .watchlist-name,
   .watchlist-price { text-align: center; }
-  .watchlist-ma { gap: 10px; }
+  .watchlist-ma { flex-direction: column; gap: 0; }
 
 }
 
 @media (min-width: 521px) and (max-width: 900px) {
+  .watchlist-grid { grid-auto-columns: calc(100% / 3); }
+
   #overlay-bar {
     gap: 8px;
     padding-inline: 10px;
@@ -666,6 +668,14 @@ html, body {
   .overlay-time {
     display: none;
   }
+}
+
+@media (min-width: 521px) and (max-width: 900px) and (min-height: 701px) {
+  .watchlist-cell:not(.is-empty) { column-gap: 8px; }
+  .watchlist-name { font-size: 28px; }
+  .watchlist-change { font-size: 36px; }
+  .watchlist-price { font-size: 20px; }
+  .watchlist-ma { font-size: 15px; gap: 6px; }
 }
 
 /* ===== Tooltip ===== */
