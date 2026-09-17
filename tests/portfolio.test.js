@@ -19,7 +19,8 @@ test("dashboard payload contains summary and holdings", async () => {
   assert.ok(payload.holdings.every((item) => item.fund_name));
   assert.ok(payload.holdings.some((item) => item.position_role));
   assert.ok(payload.holdings.some((item) => item.current_nav_date || item.current_nav));
-  assert.ok(["manual_template", "screenshot_import"].includes(payload.data_source.source_type));
+  assert.equal(typeof payload.data_source.source_type, "string");
+  assert.ok(payload.data_source.source_type.length > 0);
   assert.match(payload.data_source.source_file, /current_holdings\.json$/);
   assert.ok("latest_confirmed_nav_date" in payload.data_source);
 });

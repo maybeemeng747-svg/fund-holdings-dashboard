@@ -332,6 +332,7 @@ async function fetchSnapshot() {
 let _lastStockQuotes = [];
 let _lastWatchlistQuotes = [];
 let _stockQuotesStale = false;
+const WATCHLIST_LIMIT = 10;
 
 async function fetchStockQuotes() {
   try {
@@ -339,7 +340,7 @@ async function fetchStockQuotes() {
     if (!r.ok) throw new Error('Stock API error');
     const d = await r.json();
     const quotes = d.quotes || [];
-    const watchlistQuotes = (d.watchlist_quotes || []).slice(0, 5);
+    const watchlistQuotes = (d.watchlist_quotes || []).slice(0, WATCHLIST_LIMIT);
     if (quotes.length > 0) {
       _lastStockQuotes = quotes;
     }
@@ -356,10 +357,10 @@ async function fetchStockQuotes() {
 
 function renderWatchlist(quotes) {
   const grid = document.getElementById('watchlist-grid');
-  const items = (quotes || []).slice(0, 5);
+  const items = (quotes || []).slice(0, WATCHLIST_LIMIT);
   grid.innerHTML = '';
 
-  for (let index = 0; index < 5; index += 1) {
+  for (let index = 0; index < WATCHLIST_LIMIT; index += 1) {
     const quote = items[index];
     const cell = document.createElement('div');
     cell.className = quote ? 'watchlist-cell' : 'watchlist-cell is-empty';
@@ -388,7 +389,7 @@ function renderWatchlist(quotes) {
     grid.appendChild(cell);
   }
 
-  document.getElementById('watchlist-count').textContent = `${items.length}/5`;
+  document.getElementById('watchlist-count').textContent = `${items.length}/${WATCHLIST_LIMIT}`;
 }
 
 async function fetchPolysilicon() {

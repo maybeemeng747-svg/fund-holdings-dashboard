@@ -197,6 +197,7 @@ html, body {
 .watchlist-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
   flex: 1;
   min-height: 0;
 }
@@ -213,7 +214,19 @@ html, body {
   overflow: hidden;
 }
 
-.watchlist-cell:last-child { border-right: 0; }
+.watchlist-cell:not(.is-empty) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "name change"
+    "price price"
+    "averages averages";
+  align-content: center;
+  column-gap: 6px;
+}
+
+.watchlist-cell:nth-child(-n+5) { border-bottom: 1px solid #343b44; }
+.watchlist-cell:nth-child(5n) { border-right: 0; }
 
 .watchlist-cell.is-empty {
   display: flex;
@@ -225,8 +238,9 @@ html, body {
 }
 
 .watchlist-name {
+  grid-area: name;
   color: #ffffff;
-  font-size: 24px;
+  font-size: 21px;
   font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
@@ -234,25 +248,28 @@ html, body {
 }
 
 .watchlist-change {
+  grid-area: change;
   margin-top: 2px;
-  font-size: 31px;
+  font-size: 26px;
   font-weight: 950;
   font-variant-numeric: tabular-nums;
 }
 
 .watchlist-price {
+  grid-area: price;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
 .watchlist-ma {
+  grid-area: averages;
   display: flex;
   justify-content: center;
   gap: 10px;
   margin-top: 4px;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -530,11 +547,12 @@ html, body {
 
 /* ===== 小屏适配 ===== */
 @media (max-height: 700px) {
-  .watchlist-cell { padding-block: 7px; }
-  .watchlist-name { font-size: 21px; }
-  .watchlist-change { font-size: 27px; }
-  .watchlist-price { font-size: 16px; }
-  .watchlist-ma { font-size: 13px; gap: 8px; }
+  .watchlist-cell { padding: 1px 4px; }
+  .watchlist-cell:not(.is-empty) { column-gap: 3px; }
+  .watchlist-name { font-size: 15px; }
+  .watchlist-change { margin-top: 0; font-size: 21px; }
+  .watchlist-price { font-size: 14px; }
+  .watchlist-ma { margin-top: 1px; font-size: 11px; gap: 6px; }
   .tile .tile-name { font-size: 18px; }
   .tile .tile-code { font-size: 11px; }
   .tile .tile-pct { font-size: 28px; margin-top: 0; }
@@ -606,19 +624,26 @@ html, body {
 
   .watchlist-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-template-rows: repeat(2, minmax(0, 1fr));
+    grid-template-rows: none;
+    grid-auto-rows: 124px;
+    overflow-y: auto;
   }
   .watchlist-cell {
     padding: 5px 4px;
     border-bottom: 1px solid #343b44;
   }
+  .watchlist-cell:not(.is-empty) { display: flex; }
   .watchlist-cell:nth-child(3n) { border-right: 0; }
-  .watchlist-cell:nth-child(n+4) { border-bottom: 0; }
+  .watchlist-cell:nth-child(5n) { border-right: 1px solid #343b44; }
+  .watchlist-cell:nth-child(10) { border-bottom: 0; }
   .watchlist-cell.is-empty { font-size: 14px; }
   .watchlist-name { font-size: 21px; }
   .watchlist-change { font-size: 26px; }
   .watchlist-price { font-size: 16px; }
   .watchlist-ma { flex-direction: column; gap: 0; margin-top: 3px; font-size: 13px; }
+
+  .watchlist-grid::-webkit-scrollbar { width: 4px; }
+  .watchlist-grid::-webkit-scrollbar-thumb { background: #59636f; }
 }
 
 @media (min-width: 521px) and (max-width: 900px) {

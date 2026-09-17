@@ -330,3 +330,16 @@
 - **修改文件**：`AGENTS.md`、`.agents/skills/read-current-holdings/SKILL.md`、`docs/project-overview.md`、`docs/DECISIONS.md`、`tests/portfolio.test.js`
 - **数据恢复**：恢复此前由用户明确加入的利通电子和百合花；不修改其他真实持仓字段
 - **测试结果**：`npm test` 40 pass / 0 fail；看板 API 已重新读取两只观察股；恢复前快照保存在外部真源的 `snapshots/` 目录
+
+---
+
+## 2026-09-17 | 观察仓扩容到十格
+
+- **执行者**：Codex App
+- **任务**：将观察仓容量从 5 只扩大到 10 只，不修改现有观察标的
+- **修改文件**：`server.js`、`public/app.js`、`public/index.html`、`public/styles.css`
+- **布局**：桌面 5×2 显示十格；手机保持三列和大字，通过观察仓内部滚动查看后续位置
+- **数据安全**：未修改 `watchlist` 真源内容
+- **测试维护**：持仓来源断言改为接受任意非空来源名称，兼容当前 `true_source_sync` 和后续更新器
+- **验收范围**：1280×720、800×480、390×844；低高度屏幕单独收紧名称与涨幅间距，手机端保留大字
+- **测试结果**：`npm test` 40 pass / 0 fail；正式 LaunchAgent 已恢复运行；三种尺寸均无页面或单元格溢出

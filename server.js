@@ -17,6 +17,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const publicDir = path.join(__dirname, "public");
 const port = Number(process.env.PORT || 3030);
+const WATCHLIST_LIMIT = 10;
 
 let _polysiliconCache = null;
 const mimeTypes = {
@@ -166,7 +167,7 @@ async function handleApi(req, res) {
       const stockItems = holdings.stocks || (holdings.holdings || []).filter(h => h._is_stock || h.stock_code);
       const watchlistItems = (holdings.workspace_meta?.watchlist || holdings.watchlist || [])
         .filter(item => item?.code || item?.stock_code || item?.fund_code)
-        .slice(0, 5);
+        .slice(0, WATCHLIST_LIMIT);
       const allQuotes = await fetchStockRealtime([...stockItems, ...watchlistItems]);
       const quotes = allQuotes.slice(0, stockItems.length);
       const watchlistQuotes = allQuotes.slice(stockItems.length);
